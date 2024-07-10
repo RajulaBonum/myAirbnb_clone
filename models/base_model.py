@@ -4,25 +4,25 @@
  for other classes
  """
 
- import uuid # For generatin an id for class
- from datetime import datetime
+import uuid # For generatin an id for class
+from datetime import datetime
 
- class BaseModel:
+class BaseModel:
 
- 	def __init__(self, id, created_at, updated_at):
- 	"""
- 	Public instance attributes
- 	datetime class to give the current date and time
- 	uuid to give the instance a unique id
- 	"""
- 	self.id = uuid.uuid4()
- 	self.created_at = datetime.now()
- 	self.updated_at = datetime.now()
+	def __init__(self, id, created_at, updated_at):
+		"""
+ 		Public instance attributes
+ 		datetime class to give the current date and time
+ 		uuid to give the instance a unique id
+ 		"""
+ 		self.id = uuid.uuid4()
+ 		self.created_at = datetime.now()
+ 		self.updated_at = datetime.now()
 
  	#__str__ to print readable objects instances
  	#__dict__ - a dictionary contains all attributes of an object
  	def __str__(self):
- 		print(f'{[self.__class__.__name__]} {<self.id>} {<self.__dict__>}')
+ 		print(f'{[self.__class__.__name__]} {(self.id)} {self.__dict__}')
 
  	def save(self):
  		"""
