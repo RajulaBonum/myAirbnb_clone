@@ -38,13 +38,15 @@ class HBNBCommand(cmd.Cmd):
 
 		if not line:
 			print(" ** class name missing **")
-		else:
-			if line != 'BaseModel':
-				print("** class doesn't exist **")
-			else:
-				new_obj = BaseModel()
-				new_obj.save()
-				print(new_obj.id)
+			return
+
+		if line not in globals():
+			print("** class doesn't exist **")
+			return
+
+		new_instance = globals()[line]()
+		new_instance.save()
+		print(new_instance.id)
 
 	def do_show(self, line):
 		"""Prints the string representation of \
@@ -54,20 +56,25 @@ class HBNBCommand(cmd.Cmd):
 
 		if not line:
 			print("** class name missing **")
-		else:
-			if args[0] != 'BaseModel':
-				print("** class doesn't exist **")
-			else:
-				if len(args) < 2:
-					print("** instance id missing **")
-				else:
-					name_id = '.'.join(args)
-					all_objs = storage.all()
-					if name_id not in all_objs.keys():
-						print("** no instance found **")
-					else:
-						print(all_objs[name_id])
+			return
 
+		if args[0] not in globals():
+			print("** class doesn't exist **")
+			return
+
+		if len(args) < 2:
+			print("** instance id missing **")
+			return
+
+		name_id = f'{args[0]}.{args[1]}'
+		all_objs = storage.all()
+
+		if name_id not in all_objs.keys():
+			print("** no instance found **")
+			return
+
+		print(all_objs[name_id])
+		
 	def do_destroy(self, line):
 		"""Deletes an instance based on the class name and id (save the change into the JSON file
 		). Ex: $ destroy BaseModel 1234-1234-1234."""
@@ -76,34 +83,41 @@ class HBNBCommand(cmd.Cmd):
 
 		if not line:
 			print("** class name missing **")
-		else:
-			if args[0] != 'BaseModel':
-				print("** class doesn't exist **")
-			else:
-				if len(args) < 2:
-					print("** instance id missing **")
-				else:
-					name_id = '.'.join(args)
-					all_objs = storage.all()
-					if name_id not in all_objs.keys():
-						print("** no instance found **")
-					else:
-						del all_objs[name_id]
-						storage.save()
+			return
 
+		if args[0] not in globals():
+			print("** class doesn't exist **")
+			return
+
+		if len(args) < 2:
+			print("** instance id missing **")
+			return
+
+		name_id = f'{args[0]}.{args[1]}'
+		all_objs = storage.all()
+
+		if name_id not in all_objs.keys():
+			print("** no instance found **")
+			return
+
+		del all_objs[name_id]
+		storage.save()
+					
 	def do_all(self, line):
 		""" Prints all string representation of all instances based 
 		or not on the class name. Ex: $ all BaseModel or $ all."""
 
+		if line and line not in globals():
+			print("** class doesn't exist")
+			return
+
 		all_objs = storage.all()
 
-		if line not in all_objs.keys():
-			print("** class doesn't exist **")
-			return
 		if line:
 			print([str(all_objs[key]) for key in all_objs if key.startswith(line)])
 		else:
 			print([str(all_objs[key]) for key in all_objs])
+		
 
 	def do_update(self, line):
 		"""Updates an instance based on the class name and id 
@@ -114,30 +128,40 @@ class HBNBCommand(cmd.Cmd):
 
 		if not line:
 			print("** class name missing **")
-		else:
-			if args[0] != 'BaseModel':
-				print("** class doesn't exist **")
-			else:
-				if len(args) < 2:
-					print("** instance id missing **")
-				else:
-					name_id = '.'.join(args[:2])
-					all_objs = storage.all()
-					if name_id not in all_objs.keys():
-						print("** no instance found **")
-					else:
-						if len(args) < 3:
-							print("** attribute name missing **")
-						else:
-							obj = all_objs[name_id]
-							attr_name = agrs[2]
-							attr_value = args[3].strip('"')
+			return
 
-							if hasattr(obj, attr_name):
-								attr_name = type(getattr(obj, attr_name))
-								attr_value = attr_type(attr_value)
-							setattr(obj, attr_name, attr_value)
-							obj.save
+		if args[0] not in globals():
+			print("** class doesn't exist **")
+			return
+
+		if len(args) < 2:
+			print("** instance id missing **")
+			return
+
+		name_id = f'{args[0]}.{args[1]}'
+		all_objs = storage.all()
+
+		if name_id not in all_objs.keys():
+			print("** no instance found **")
+			return
+
+		if len(args) < 3:
+			print("** attribute name missing **")
+			return
+
+		if len(args) < 4:
+			print("** Value missing **")
+			return
+
+		obj = all_objs[name_id]
+		attr_name = agrs[2]
+		attr_value = args[3].strip('"')
+		if hasattr(obj, attr_name):
+			attr_type = type(getattr(obj, attr_name))
+			attr_value = attr_type(attr_value)
+
+		setattr(obj, attr_name, attr_value)
+		obj.save
 
 if __name__ == '__main__':
 	HBNBCommand().cmdloop()

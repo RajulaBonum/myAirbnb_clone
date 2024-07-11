@@ -44,12 +44,16 @@ class FileStorage:
 		"""
 		if os.path.exists(self.__file_path):
 			with open(self.__file_path, 'r') as f:
-				obj_dict = json.load(f)
-				from models.base_model import BaseModel
-				for key, value in obj_dict.items():
-					cls_name = value['__class__']
-					if cls_name == 'BaseModel':
-						"""
-						converting from dictionary to object
-						"""
-						self.__objects[key] = BaseModel(**value)
+				try:
+					obj_dict = json.load(f)
+					from models.base_model import BaseModel
+					for key, value in obj_dict.items():
+						cls_name = value['__class__']
+						if cls_name == 'BaseModel':
+							"""
+							converting from dictionary to object
+							"""
+							self.__objects[key] = BaseModel(**value)
+				except json.JSONDecodeError:
+					#handle empty or invalid JSON file case
+					pass
